@@ -25,15 +25,16 @@ mRNA:
 * mrna_id       (Fixnum)
 * strand        (String) '+' or '-'
 * chromosome    (String)
-* segment_count (Fixnum)
-* segment_ids   (Array[Fixnum])
+* segment_ids   (Array[Fixnum]) -- this field should contain segment_ids of segments
+                                   that constitute the mRNA, in order of how they are
+                                   arranged in the mRNA. Sorted from 5' to 3'.
 
 segment:
 
 * segment_id (Fixnum)
+* strand     (String) '+' or '-'
 * chromosome (String)
+* mrnas      (Array[Fixum])
 * start      (Fixnum)
 * stop       (Fixnum)
-* strand     (String) '+' or '-'
 * splicing   (String) 'const' or 'alt'
-* mrnas      (Array[Fixum])
