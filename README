@@ -1,0 +1,39 @@
+Library aims to parse typical flybase gene annotation text file.
+Each string has 11 tab separates colums. Like this one:
+
+  | unknown    | 585             |
+  | gene_id    | CG11023-RA      |
+  | chromosome | chr2L           |
+  | strand     | +               |
+  | mrna_start | 7528            |
+  | mrna_stop  | 9491            |
+  | unkwnown   | 7679            |
+  | mrna_id    | 9276            |
+  | seg_count  | 3               |
+  | seg_starts | 7528,8228,8667, |
+  | seg_stops  | 8116,8589,9491, |
+
+There can be several records with the same mrna_id, which denotes
+alternative splicing.
+
+Library should return mrna and segment objects.
+
+Blueprints:
+
+mRNA:
+
+* mrna_id       (Fixnum)
+* strand        (String) '+' or '-'
+* chromosome    (String)
+* segment_count (Fixnum)
+* segment_ids   (Array[Fixnum])
+
+segment:
+
+* segment_id (Fixnum)
+* chromosome (String)
+* start      (Fixnum)
+* stop       (Fixnum)
+* strand     (String) '+' or '-'
+* splicing   (String) 'const' or 'alt'
+* mrnas      (Array[Fixum])
