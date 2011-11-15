@@ -1,17 +1,17 @@
 Library aims to parse typical flybase gene annotation text file.
-Each string has 11 tab separates colums. Like this one:
+Each string has 11 tab separated colums. Like this one:
 
-  | unknown    | 585             |
-  | gene_id    | CG11023-RA      |
-  | chromosome | chr2L           |
-  | strand     | +               |
-  | mrna_start | 7528            |
-  | mrna_stop  | 9491            |
-  | unkwnown   | 7679            |
-  | mrna_id    | 9276            |
-  | seg_count  | 3               |
-  | seg_starts | 7528,8228,8667, |
-  | seg_stops  | 8116,8589,9491, |
+  | unknown      | 585             |
+  | mrna_id      | CG11023-RA      |
+  | chromosome   | chr2L           |
+  | strand       | +               |
+  | mrna_start   | 7528            | \ -- with UTRs
+  | mrna_stop    | 9491            | /
+  | mrna_c_start | 7679            | \ -- without UTRs
+  | mrna_c_stop  | 9276            | /
+  | seg_count    | 3               |
+  | seg_starts   | 7528,8228,8667, |
+  | seg_stops    | 8116,8589,9491, |
 
 There can be several records with the same mrna_id, which denotes
 alternative splicing.
@@ -22,12 +22,13 @@ Blueprints:
 
 mRNA:
 
-* mrna_id       (Fixnum)
-* strand        (String) '+' or '-'
-* chromosome    (String)
-* segment_ids   (Array[Fixnum]) -- this field should contain segment_ids of segments
-                                   that constitute the mRNA, in order of how they are
-                                   arranged in the mRNA. Sorted from 5' to 3'.
+* mrna_id     (String)
+* gene_id     (Fixnum)
+* strand      (String) '+' or '-'
+* chromosome  (String)
+* segment_ids (Array[Fixnum]) -- this field should contain segment_ids of segments
+                                 that constitute the mRNA, in order of how they are
+                                 arranged in the mRNA. Sorted from 5' to 3'.
 
 segment:
 
