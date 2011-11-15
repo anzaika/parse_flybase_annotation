@@ -1,17 +1,17 @@
 Library aims to parse typical flybase gene annotation text file.
 Each string has 11 tab separated colums. Like this one:
 
-  | unknown      | 585             |
-  | mrna_id      | CG11023-RA      |
-  | chromosome   | chr2L           |
-  | strand       | +               |
-  | mrna_start   | 7528            | \ -- with UTRs
-  | mrna_stop    | 9491            | /
-  | mrna_c_start | 7679            | \ -- without UTRs
-  | mrna_c_stop  | 9276            | /
-  | seg_count    | 3               |
-  | seg_starts   | 7528,8228,8667, |
-  | seg_stops    | 8116,8589,9491, |
+ 0  | unknown      | 585             |
+ 1  | mrna_id      | CG11023-RA      |
+ 2  | chromosome   | chr2L           |
+ 3  | strand       | +               |
+ 4  | mrna_start   | 7528            | \ -- with UTRs
+ 5  | mrna_stop    | 9491            | /
+ 6  | mrna_c_start | 7679            | \ -- without UTRs
+ 7  | mrna_c_stop  | 9276            | /
+ 8  | seg_count    | 3               |
+ 9  | seg_starts   | 7528,8228,8667, |
+ 10 | seg_stops    | 8116,8589,9491, |
 
 There can be several records with the same mrna_id, which denotes
 alternative splicing.
@@ -32,10 +32,8 @@ mRNA:
 
 segment:
 
-* segment_id (Fixnum)
-* strand     (String) '+' or '-'
 * chromosome (String)
-* mrnas      (Array[Fixum])
+* mrnas      (Array[String])
 * start      (Fixnum)
 * stop       (Fixnum)
 * splicing   (String) 'const' or 'alt'
