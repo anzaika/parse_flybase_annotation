@@ -6,20 +6,85 @@ module ParseFlybaseAnnotation
   class Segment < OpenStruct; end
 
   def self.parse( filepath )
-    annotation = File.open(filepath, 'r').readlines
-    annotations.map do |ant|
-      ant_split = ant.split("\t")
+    mrnas = []
+    segments = []
+    File
+      .open(filepath, 'r')
+      .each_line{|line| mrnas << self.parse_annotation_string(line) }
+
+    mrnas.map{|mrna| mrna.gene_id}.uniq.each do |gene_id|
+      self.infer_splicing(
+        mrnas.find_all{|mrna| mrna.gene_id == gene_id})
+    end
   end
 
   def self.parse_annotation_string( string )
-    splitted = string.split("\t")
-    OpenStruct.new(
+    splt = string.split
+    Mrna.new(
       {
-        'chromosome' => ant_split[2],
-        'strand'     => ant_split[3],
-        'mrna_id'    => ant_split[7]
-      }
-    )
+        'mrna_id'    => splt[1],
+        'gene_id'    => parse_gene_id(splt[1]),
+        'chromosome' => parse_chromosome_name(splt[2]),
+        'strand'     => splt[3],
+        'segments'   => self.parse_segments(splt[9], splt[10], splt[6], splt[7])
+      })
+  end
+
+  def self.parse_gene_id( mrna_id )
+    mrna_id.scan(/\d+/).first.to_i
+  end
+
+  def self.parse_chromosome_name( chromosome )
+    case chromosome
+    when 'chrXhet', 'chrYhet' then nil
+    when 'chr2L','chr2R','chr3R','chr3L','chrX' then
+      chromosome[3,2]
+    else
+      warn "Can't parse chromosome name -> #{chromosome}"
+      nil
+    end
+  end
+
+  def self.parse_segments( start_coord, stop_coord, mrna_c_start, mrna_c_stop )
+    segments =
+      start_coord
+        .split(',')
+        .map{|el| el.to_i}
+        .zip( stop_coord
+                .split(',')
+                .map{|el| el.to_i}
+            )
+    segments[0][0] = mrna_c_start.to_i
+    segments[-1][-1] = mrna_c_stop.to_i
+
+    segments
+  rescue => e
+    warn "Error when parsing segments: #{start_coord}|#{stop_coord}"
+    raise
+  end
+
+  # TODO Need to attach mrna_id info to segment
+  def self.infer_splicing( mrnas, &block )
+    segments =
+      mrnas
+        .map{|mrna| mrna.segments}
+        .flatten(1)
+        .uniq
+        .map{|seg| Segment.new({'start' => seg.first,'stop' => seg.last})}
+    mrnas
+      .map{|mrna| mrna.segments}
+      .flatten(1)
+      .uniq
+      .each do |seg|
+        mrnas.all?{|mrna| mrna.segments.include?(seg)} ? spl = 'const' : spl = 'alt'
+        segments << Segment.new(
+          {
+            'start'    => seg.first,
+            'stop'     => seg.last,
+            'splicing' => spl
+          })
+      end
+    segments
   end
 
 end
