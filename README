@@ -32,7 +32,7 @@ Blueprints:
 mRNA:
 
 * mrna_id     (String)
-* gene_id     (Fixnum)
+* gene_id     (String)
 * strand      (String) -- '+' or '-'
 * chromosome  (String)
 * exons       (Array)  -- coordinates of exons, e.g.: [[1,2],[3,4]]

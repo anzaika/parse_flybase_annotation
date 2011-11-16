@@ -1,4 +1,5 @@
 require_relative "parse_flybase_annotation/version"
+require 'set'
 require 'ostruct'
 
 module ParseFlybaseAnnotation
@@ -8,14 +9,16 @@ module ParseFlybaseAnnotation
   def self.parse( filepath )
     mrnas = []
     exons = []
-    File
-      .open(filepath, 'r')
-      .each_line{|line| mrnas << self.parse_annotation_string(line) }
+
+    File.open(filepath, 'r')
+        .each_line{|line| mrnas << self.parse_annotation_string(line) }
 
     mrnas.map{|mrna| mrna.gene_id}.uniq.each do |gene_id|
-      self.infer_splicing(
-        mrnas.find_all{|mrna| mrna.gene_id == gene_id})
+      exons <<
+        self.generate_exons_from(mrnas.find_all{|mrna| mrna.gene_id == gene_id})
     end
+
+    {'mrnas' => mrnas, 'exons' => exons.flatten}
   end
 
   def self.parse_annotation_string( string )
@@ -26,12 +29,12 @@ module ParseFlybaseAnnotation
         'gene_id'    => parse_gene_id(splt[1]),
         'chromosome' => parse_chromosome_name(splt[2]),
         'strand'     => splt[3],
-        'exons'   => self.parse_exons(splt[9], splt[10], splt[6], splt[7])
+        'exons'      => self.parse_exons(splt[9], splt[10], splt[6], splt[7])
       })
   end
 
   def self.parse_gene_id( mrna_id )
-    mrna_id.scan(/\d+/).first.to_i
+    mrna_id.scan(/\d+/).first
   end
 
   def self.parse_chromosome_name( chromosome )
@@ -63,27 +66,30 @@ module ParseFlybaseAnnotation
     raise
   end
 
-  # TODO Need to attach mrna_id info to exon
-  def self.infer_splicing( mrnas, &block )
+  def self.generate_exons_from( mrnas )
+
     exons =
       mrnas
         .map{|mrna| mrna.exons}
         .flatten(1)
         .uniq
-        .map{|seg| Exon.new({'start' => seg.first,'stop' => seg.last})}
-    mrnas
-      .map{|mrna| mrna.exons}
-      .flatten(1)
-      .uniq
-      .each do |seg|
-        mrnas.all?{|mrna| mrna.exons.include?(seg)} ? spl = 'const' : spl = 'alt'
-        exons << Exon.new(
-          {
-            'start'    => seg.first,
-            'stop'     => seg.last,
-            'splicing' => spl
-          })
+        .map{|exon| Exon.new({'start'=>exon.first, 'stop'=>exon.last, 'mrnas'=>[]})}
+
+    exons.each do |exon|
+      mrnas.each do |mrna|
+        if mrna.exons.include?([exon.start, exon.stop])
+          exon.mrnas << mrna.mrna_id
+        end
       end
+    end
+
+    mrna_ids = mrnas.map{|mrna| mrna.mrna_id }
+    exons.each do |exon|
+      mrna_ids.all?{|mrna_id| exon.mrnas.include?(mrna_id)} ? spl = 'const' : spl = 'alt'
+      exon.splicing = spl
+      exon.chromosome = mrnas.first.chromosome
+    end
+
     exons
   end
 
