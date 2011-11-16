@@ -1,5 +1,12 @@
-Library aims to parse typical flybase gene annotation text file.
-Each string has 11 tab separated colums. Like this one:
+Purpose
+=======
+
+Extract exon information out of flybase gene annotation.
+
+Source Data
+===========
+
+Is a multiline text file, where each line has 11 tab separated columns.
 
  0  | unknown      | 585             |
  1  | mrna_id      | CG11023-RA      |
@@ -13,10 +20,12 @@ Each string has 11 tab separated colums. Like this one:
  9  | seg_starts   | 7528,8228,8667, |
  10 | seg_stops    | 8116,8589,9491, |
 
-There can be several records with the same mrna_id, which denotes
-alternative splicing.
+gene_id can be inferred from mrna_id: CG11023-RA --> 11023.
 
-Library should return mrna and segment objects.
+Output
+======
+
+Two collections: mRNAs and exons. Exons should have their UTRs cutted out.
 
 Blueprints:
 
@@ -24,16 +33,15 @@ mRNA:
 
 * mrna_id     (String)
 * gene_id     (Fixnum)
-* strand      (String) '+' or '-'
+* strand      (String) -- '+' or '-'
 * chromosome  (String)
-* segment_ids (Array[Fixnum]) -- this field should contain segment_ids of segments
-                                 that constitute the mRNA, in order of how they are
-                                 arranged in the mRNA. Sorted from 5' to 3'.
+* exons       (Array)  -- coordinates of exons, e.g.: [[1,2],[3,4]]
+                          sorted 5' --> 3'
 
-segment:
+exon:
 
 * chromosome (String)
-* mrnas      (Array[String])
+* mrnas      (Array[String]) -- array of mrna_ids
 * start      (Fixnum)
 * stop       (Fixnum)
-* splicing   (String) 'const' or 'alt'
+* splicing   (String) -- 'const' or 'alt'
