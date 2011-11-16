@@ -5,7 +5,7 @@ Feature: Parse gene annotation
       585     CG11023-RA      chr2L   +       7528    9491    7679    9276    3       7528,8228,8667, 8116,8589,9491,
       """
     When I parse annotation
-    Then there should be 1 mrna
+    Then there should be 1 mrnas
     And there should be 3 exons
     And there should be mrna:
       | mrna_id    | CG11023-RA                            |

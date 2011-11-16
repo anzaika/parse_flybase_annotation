@@ -20,7 +20,7 @@ When /^I parse annotation/ do
   @result = ParseFlybaseAnnotation.parse('annotation')
 end
 
-Then /^there should be (\d+) mrna/ do |number|
+Then /^there should be (\d+) mrnas/ do |number|
   @result['mrnas'].count.should == number.to_i
 end
 
