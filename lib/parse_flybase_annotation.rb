@@ -3,11 +3,11 @@ require 'ostruct'
 
 module ParseFlybaseAnnotation
   class Mrna < OpenStruct; end
-  class Segment < OpenStruct; end
+  class Exon < OpenStruct; end
 
   def self.parse( filepath )
     mrnas = []
-    segments = []
+    exons = []
     File
       .open(filepath, 'r')
       .each_line{|line| mrnas << self.parse_annotation_string(line) }
@@ -26,7 +26,7 @@ module ParseFlybaseAnnotation
         'gene_id'    => parse_gene_id(splt[1]),
         'chromosome' => parse_chromosome_name(splt[2]),
         'strand'     => splt[3],
-        'segments'   => self.parse_segments(splt[9], splt[10], splt[6], splt[7])
+        'exons'   => self.parse_exons(splt[9], splt[10], splt[6], splt[7])
       })
   end
 
@@ -45,8 +45,8 @@ module ParseFlybaseAnnotation
     end
   end
 
-  def self.parse_segments( start_coord, stop_coord, mrna_c_start, mrna_c_stop )
-    segments =
+  def self.parse_exons( start_coord, stop_coord, mrna_c_start, mrna_c_stop )
+    exons =
       start_coord
         .split(',')
         .map{|el| el.to_i}
@@ -54,37 +54,37 @@ module ParseFlybaseAnnotation
                 .split(',')
                 .map{|el| el.to_i}
             )
-    segments[0][0] = mrna_c_start.to_i
-    segments[-1][-1] = mrna_c_stop.to_i
+    exons[0][0] = mrna_c_start.to_i
+    exons[-1][-1] = mrna_c_stop.to_i
 
-    segments
+    exons
   rescue => e
-    warn "Error when parsing segments: #{start_coord}|#{stop_coord}"
+    warn "Error when parsing exons: #{start_coord}|#{stop_coord}"
     raise
   end
 
-  # TODO Need to attach mrna_id info to segment
+  # TODO Need to attach mrna_id info to exon
   def self.infer_splicing( mrnas, &block )
-    segments =
+    exons =
       mrnas
-        .map{|mrna| mrna.segments}
+        .map{|mrna| mrna.exons}
         .flatten(1)
         .uniq
-        .map{|seg| Segment.new({'start' => seg.first,'stop' => seg.last})}
+        .map{|seg| Exon.new({'start' => seg.first,'stop' => seg.last})}
     mrnas
-      .map{|mrna| mrna.segments}
+      .map{|mrna| mrna.exons}
       .flatten(1)
       .uniq
       .each do |seg|
-        mrnas.all?{|mrna| mrna.segments.include?(seg)} ? spl = 'const' : spl = 'alt'
-        segments << Segment.new(
+        mrnas.all?{|mrna| mrna.exons.include?(seg)} ? spl = 'const' : spl = 'alt'
+        exons << Exon.new(
           {
             'start'    => seg.first,
             'stop'     => seg.last,
             'splicing' => spl
           })
       end
-    segments
+    exons
   end
 
 end

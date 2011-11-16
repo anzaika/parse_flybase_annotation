@@ -10,22 +10,22 @@ describe "ParseFlybaseAnnotation" do
         'gene_id'    => 11023,
         'chromosome' => '2L',
         'strand'     => '+',
-        'segments'   => [[7679,8116],[8228,8589],[8667,9276]]
+        'exons'   => [[7679,8116],[8228,8589],[8667,9276]]
       })
   }
-  let(:segments) {
+  let(:exons) {
     [
-      Segment.new({'start' => 1,
+      Exon.new({'start' => 1,
                    'stop' => 2,
                    'chromosome' => '2L',
                    'mrnas' => ['CG11023-RA'],
                    'splicing' => 'const'}),
-      Segment.new({'start' => 3,
+      Exon.new({'start' => 3,
                    'stop' => 4,
                    'chromosome' => '2L',
                    'mrnas' => ['CG11023-RA'],
                    'splicing' => 'alt'}),
-      Segment.new({'start' => 5,
+      Exon.new({'start' => 5,
                    'stop' => 6,
                    'chromosome' => '2L',
                    'mrnas' => ['CG11023-RA'],
@@ -69,10 +69,10 @@ describe "::parse_chromosome_name" do
   end
 end
 
-describe "::parse_segments" do
+describe "::parse_exons" do
   it "should parse segmens start and stop coordinates cutting the UTRs" do
     ParseFlybaseAnnotation
-      .parse_segments('1,5,10,', '3,8,12,', '2', '11')
+      .parse_exons('1,5,10,', '3,8,12,', '2', '11')
       .should == [[2,3],[5,8],[10,11]]
   end
 end
@@ -81,7 +81,7 @@ describe "::infer_splicing" do
   it "should infer splicing from an array of mrnas" do
     ParseFlybaseAnnotation
       .infer_splicing(mrna)
-      .should == segments
+      .should == exons
   end
 end
 

@@ -19,25 +19,25 @@ Feature: Parse gene annotation
       """
     When I parse annotation
     Then there should be 1 mrna
-    And there should be 3 segments
+    And there should be 3 exons
     And there should be mrna:
       | mrna_id    | CG11023-RA                            |
       | strand     | +                                     |
       | chromosome | 2L                                    |
-      | segments   | [[7679,8116],[8228,8589],[8667,9276]] |
-    And there should be segment:
+      | exons   | [[7679,8116],[8228,8589],[8667,9276]] |
+    And there should be exon:
       | chromosome    | 2L              |
       | mrnas         | ["CG11023-RA"]  |
       | start         | 7679            |
       | stop          | 8116            |
       | splicing      | const           |
-    And there should be segment:
+    And there should be exon:
       | chromosome    | 2L              |
       | mrnas         | ["CG11023-RA"]  |
       | start         | 8228            |
       | stop          | 8589            |
       | splicing      | const           |
-    And there should be segment:
+    And there should be exon:
       | chromosome    | 2L              |
       | mrnas         | ["CG11023-RA"]  |
       | start         | 8667            |
