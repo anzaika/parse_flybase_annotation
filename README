@@ -45,3 +45,13 @@ exon:
 * start      (Fixnum)
 * stop       (Fixnum)
 * splicing   (String) -- 'const' or 'alt'
+
+Usage
+=====
+
+  require 'parse_flubase_annotation'
+
+  result = ParseFlybaseAnnotation.parse('path_to_annotation_file')
+
+  exons_collection = result['exons']
+  mrnas_collection = result['mrnas']
