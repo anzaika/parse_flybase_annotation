@@ -25,7 +25,7 @@ gene_id can be inferred from mrna_id: CG11023-RA --> 11023.
 Output
 ======
 
-Two collections: mRNAs and exons. Exons should have their UTRs cutted out.
+Two collections: mRNAs and exons. Exons have their UTRs cut out.
 
 Blueprints:
 
@@ -49,7 +49,7 @@ exon:
 Usage
 =====
 
-  require 'parse_flubase_annotation'
+  require 'parse_flybase_annotation'
 
   result = ParseFlybaseAnnotation.parse('path_to_annotation_file')
 
