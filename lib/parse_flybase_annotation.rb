@@ -6,16 +6,22 @@ module ParseFlybaseAnnotation
   class Mrna < OpenStruct; end
   class Exon < OpenStruct; end
 
+  # code here needs heavy refactoring
+  # overall logic should be like this
   def self.parse( filepath )
     mrnas = []
     exons = []
 
     File.open(filepath, 'r')
-        .each_line{|ann_string| mrnas << self.generate_mrnas_from(ann_string) }
+        .each_line do |ann_string|
+          mrnas << self.generate_mrnas_from(ann_string) }
+        end
 
     mrnas.map{|mrna| mrna.gene_id}.uniq.each do |gene_id|
       exons <<
-        self.generate_exons_from(mrnas.find_all{|mrna| mrna.gene_id == gene_id})
+        self.generate_exons_from(
+          mrnas.find_all{|mrna| mrna.gene_id == gene_id }
+        )
     end
 
     {'mrnas' => mrnas, 'exons' => exons.flatten}
@@ -23,6 +29,7 @@ module ParseFlybaseAnnotation
 
   # Generate Mrna object from annotation string
   # @param [String] ann_string annotation string
+  # @return [Mrna]
   def self.generate_mrnas_from( ann_string )
     splt = ann_string.split
     Mrna.new(
@@ -37,6 +44,7 @@ module ParseFlybaseAnnotation
 
   # Extract gene_id from mrna_id
   # @param [String] mrna_id
+  # @return [String]
   def self.generate_gene_id_from( mrna_id )
     mrna_id.scan(/\d+/).first
   end
@@ -63,6 +71,7 @@ module ParseFlybaseAnnotation
   #   of coding part of mrna
   # @param [String] mrna_c_stop a string with integer denoting the stop
   #   of coding part of mrna
+  # @return [Array]
   def self.parse_exons( start_coord, stop_coord, mrna_c_start, mrna_c_stop )
     exons =
       start_coord
