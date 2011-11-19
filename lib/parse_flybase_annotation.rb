@@ -11,7 +11,7 @@ module ParseFlybaseAnnotation
     exons = []
 
     File.open(filepath, 'r')
-        .each_line{|line| mrnas << self.parse_annotation_string(line) }
+        .each_line{|ann_string| mrnas << self.generate_mrnas_from(ann_string) }
 
     mrnas.map{|mrna| mrna.gene_id}.uniq.each do |gene_id|
       exons <<
@@ -21,19 +21,23 @@ module ParseFlybaseAnnotation
     {'mrnas' => mrnas, 'exons' => exons.flatten}
   end
 
-  def self.parse_annotation_string( string )
-    splt = string.split
+  # Generate Mrna object from annotation string
+  # @param [String] ann_string annotation string
+  def self.generate_mrnas_from( ann_string )
+    splt = ann_string.split
     Mrna.new(
       {
         'mrna_id'    => splt[1],
-        'gene_id'    => parse_gene_id(splt[1]),
+        'gene_id'    => generate_gene_id_from(splt[1]),
         'chromosome' => parse_chromosome_name(splt[2]),
         'strand'     => splt[3],
         'exons'      => self.parse_exons(splt[9], splt[10], splt[6], splt[7])
       })
   end
 
-  def self.parse_gene_id( mrna_id )
+  # Extract gene_id from mrna_id
+  # @param [String] mrna_id
+  def self.generate_gene_id_from( mrna_id )
     mrna_id.scan(/\d+/).first
   end
 
@@ -48,6 +52,17 @@ module ParseFlybaseAnnotation
     end
   end
 
+  # Parse exon start&stop coordinates
+  #
+  # @example
+  #   ParseFlybaseAnnotation.parse_exons('1,5,10,', '4,9,15', '2', '3')
+  #
+  # @param [String] start_coord comma separated list of start coordinates
+  # @param [String] stop_coord comma separated list of stop coordinates
+  # @param [String] mrna_c_start a string with integer denoting the start
+  #   of coding part of mrna
+  # @param [String] mrna_c_stop a string with integer denoting the stop
+  #   of coding part of mrna
   def self.parse_exons( start_coord, stop_coord, mrna_c_start, mrna_c_stop )
     exons =
       start_coord
@@ -60,7 +75,10 @@ module ParseFlybaseAnnotation
     exons[0][0] = mrna_c_start.to_i
     exons[-1][-1] = mrna_c_stop.to_i
 
-    exons
+    # this step implements the 5' shift that is
+    # noted in parse_gene_annotation.feature
+    exons.each{|e| e[0]+=1}
+
   rescue => e
     warn "Error when parsing exons: #{start_coord}|#{stop_coord}"
     raise

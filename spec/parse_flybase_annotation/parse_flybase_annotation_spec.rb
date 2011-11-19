@@ -11,7 +11,7 @@ describe "ParseFlybaseAnnotation" do
         'gene_id'    => '11023',
         'chromosome' => '2L',
         'strand'     => '+',
-        'exons'   => [[7679,8116],[8228,8589],[8667,9276]]
+        'exons'   => [[7680,8116],[8229,8589],[8668,9276]]
       })
   }
 
@@ -22,25 +22,25 @@ describe "ParseFlybaseAnnotation" do
         'gene_id'    => '11023',
         'chromosome' => '2L',
         'strand'     => '+',
-        'exons'   => [[7679,8116],[8667,9276]]
+        'exons'   => [[7680,8116],[8668,9276]]
       })
   }
 
   let(:exons_1) {
     [
-      Exon.new({ 'start' => 7679,
+      Exon.new({ 'start' => 7680,
                  'stop' => 8116,
                  'chromosome' => '2L',
                  'mrnas' => ['CG11023-RA'],
                  'splicing' => 'const'}),
 
-      Exon.new({ 'start' => 8228,
+      Exon.new({ 'start' => 8229,
                  'stop' => 8589,
                  'chromosome' => '2L',
                  'mrnas' => ['CG11023-RA'],
                  'splicing' => 'const'}),
 
-      Exon.new({ 'start' => 8667,
+      Exon.new({ 'start' => 8668,
                  'stop' => 9276,
                  'chromosome' => '2L',
                  'mrnas' => ['CG11023-RA'],
@@ -49,38 +49,38 @@ describe "ParseFlybaseAnnotation" do
 
   let(:exons_2) {
     [
-      Exon.new({ 'start' => 7679,
+      Exon.new({ 'start' => 7680,
                  'stop' => 8116,
                  'chromosome' => '2L',
                  'mrnas' => ['CG11023-RA', 'CG11023-RB'],
                  'splicing' => 'const'}),
 
-      Exon.new({ 'start' => 8228,
+      Exon.new({ 'start' => 8229,
                  'stop' => 8589,
                  'chromosome' => '2L',
                  'mrnas' => ['CG11023-RA'],
                  'splicing' => 'alt'}),
 
-      Exon.new({ 'start' => 8667,
+      Exon.new({ 'start' => 8668,
                  'stop' => 9276,
                  'chromosome' => '2L',
                  'mrnas' => ['CG11023-RA','CG11023-RB'],
                  'splicing' => 'const'}),
     ]}
 
-describe "::parse_annotation_string" do
+describe "::generate_mrnas_from" do
   it "should parse a string with tabbed columns into correct Mrna object" do
     annotation_string =
       "585     CG11023-RA      chr2L   +       7528    9491    7679    9276    3       7528,8228,8667, 8116,8589,9491,"
     ParseFlybaseAnnotation
-      .parse_annotation_string(annotation_string)
+      .generate_mrnas_from(annotation_string)
       .should == mrna_1
   end
 end
 
-describe "::parse_gene_id" do
-  it "should parse gen'})d out of mrna_id: CG11023-RA -> 11023" do
-    ParseFlybaseAnnotation.parse_gene_id("CG11023-RA").should == '11023'
+describe "::generate_gene_id_from" do
+  it "should parse gene_id out of mrna_id: CG11023-RA -> 11023" do
+    ParseFlybaseAnnotation.generate_gene_id_from("CG11023-RA").should == '11023'
   end
 end
 
@@ -107,8 +107,8 @@ end
 describe "::parse_exons" do
   it "should parse segmens start and stop coordinates cutting the UTRs" do
     ParseFlybaseAnnotation
-      .parse_exons('1,5,10,', '3,8,12,', '2', '11')
-      .should == [[2,3],[5,8],[10,11]]
+      .parse_exons('1,5,10,', '4,9,15,', '2', '13')
+      .should == [[3,4],[6,9],[11,13]]
   end
 end
 

@@ -22,6 +22,11 @@ Is a multiline text file, where each line has 11 tab separated columns.
 
 gene_id can be inferred from mrna_id: CG11023-RA --> 11023.
 
+Coordinates in annotation are maintained like this:
+
+  1 2 3 4 5 6 7 8 9
+   G C A T G G T C
+
 Output
 ======
 
