@@ -1,6 +1,7 @@
-require_relative "parse_flybase_annotation/base"
+require_relative "parse_flybase_annotation/main"
 require_relative "parse_flybase_annotation/exon"
 require_relative "parse_flybase_annotation/mrna"
+require_relative "parse_flybase_annotation/db"
 require_relative "parse_flybase_annotation/version"
 
 class Array

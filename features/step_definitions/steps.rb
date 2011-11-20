@@ -1,13 +1,16 @@
 require 'fakefs/safe'
 require 'json'
+require 'mongo'
 
 Before do
   FakeFS.activate!
+  @mongo = Mongo::Connection.new('localhost').db('test')
 end
 
 After do
   FakeFS::FileSystem.clear
   FakeFS.deactivate!
+  Mongo::Connection.new('localhost').drop_database('test')
 end
 
 def create_exon_from_table( table )
@@ -30,14 +33,24 @@ def create_mrna_from_table( table )
   mrna
 end
 
-Given /^the annotation/ do |annotation|
+def mongo
+  @mongo ||= Mongo::Connection.new('localhost').db('dmel_annotation')
+end
+
+Given /^the annotation:$/ do |annotation|
   @annotation_file = File.open('annotation','w') do |file|
     file << annotation
   end
 end
 
-When /^I parse annotation/ do
+When /^I parse annotation$/ do
   @result = ParseFlybaseAnnotation.parse('annotation')
+end
+
+When /^I parse and upload annotation$/ do
+  ParseFlybaseAnnotation::DB.should_receive(:new)
+    .and_return(ParseFlybaseAnnotation::DB.new('localhost','dmel_annotation'))
+  ParseFlybaseAnnotation.parse_and_upload('annotation')
 end
 
 Then /^there should be (\d+) mrnas/ do |number|
@@ -56,4 +69,8 @@ end
 Then /^there should be exon/ do |table|
   exon = create_exon_from_table(table)
   @result['exons'].should include(exon)
+end
+
+Then /^collection "mrnas" should have (\d+) elements$/ do |number|
+  @mongo['mrnas'].count.should == number
 end
