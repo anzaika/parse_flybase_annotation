@@ -1,5 +1,3 @@
-require 'set'
-
 module ParseFlybaseAnnotation
 
   # code here needs heavy refactoring
