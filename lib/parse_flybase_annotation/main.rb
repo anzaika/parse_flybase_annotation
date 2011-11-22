@@ -1,12 +1,4 @@
-require_relative 'db'
-
 module ParseFlybaseAnnotation
-
-  def self.parse_and_upload( filepath )
-    ParseFlybaseAnnotation::DB
-      .new('hpc09', 'dmel_annotation')
-      .upload_annotation(self.parse(filepath))
-  end
 
   # code here needs heavy refactoring
   def self.parse( filepath )
