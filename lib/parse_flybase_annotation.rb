@@ -1,16 +1,10 @@
-require_relative "parse_flybase_annotation/main"
-require_relative "parse_flybase_annotation/exon"
-require_relative "parse_flybase_annotation/mrna"
-require_relative "parse_flybase_annotation/version"
+lib_dir = File.expand_path(File.join(File.dirname(__FILE__), '..', 'lib'))
+$LOAD_PATH.unshift(lib_dir) unless $LOAD_PATH.include?(lib_dir)
 
-class Array
-  alias :old_map :map
+require 'my_ruby_extensions'
 
-  def map(symbol=nil)
-    if block_given?
-      self.old_map{|i| yield(i)}
-    else
-      self.old_map{|i| i.send(symbol)}
-    end
-  end
-end
+require "parse_flybase_annotation/main"
+require "parse_flybase_annotation/exon"
+require "parse_flybase_annotation/mrna"
+require "parse_flybase_annotation/version"
+

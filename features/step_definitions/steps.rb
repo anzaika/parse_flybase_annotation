@@ -1,16 +1,13 @@
 require 'fakefs/safe'
 require 'json'
-require 'mongo'
 
 Before do
   FakeFS.activate!
-  @mongo = Mongo::Connection.new('localhost').db('test')
 end
 
 After do
   FakeFS::FileSystem.clear
   FakeFS.deactivate!
-  Mongo::Connection.new('localhost').drop_database('test')
 end
 
 def create_exon_from_table( table )

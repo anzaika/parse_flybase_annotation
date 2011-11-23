@@ -8,8 +8,8 @@ Gem::Specification.new do |s|
   s.authors     = ["Andrey Zaika"]
   s.email       = ["anzaika@gmail.com"]
   s.homepage    = ""
-  s.summary     = %q{TODO: Write a gem summary}
-  s.description = %q{TODO: Write a gem description}
+  s.summary     = %q{a lib to parse flybase annotation dump}
+  s.description = %q{}
 
   s.rubyforge_project = "parse_flybase_annotation"
 
@@ -18,10 +18,12 @@ Gem::Specification.new do |s|
   s.executables   = `git ls-files -- bin/*`.split("\n").map{ |f| File.basename(f) }
   s.require_paths = ["lib"]
 
-  # specify any dependencies here; for example:
-  # s.add_development_dependency "rspec"
+  # Development dependencies
   s.add_development_dependency "cucumber"
   s.add_development_dependency "fakefs"
   s.add_development_dependency "rspec"
+
+  # Runtime dependencies
+  s.add_runtime_dependency "my_ruby_extensions"
 
 end
