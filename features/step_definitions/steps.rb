@@ -10,28 +10,36 @@ After do
   FakeFS.deactivate!
 end
 
-def create_exon_from_table( table )
-  exon =
-    ParseFlybaseAnnotation::Exon.new(Hash[
-      ['splicing','start','stop','chromosome','mrnas'].zip(table.raw.first)
-    ])
-  exon.mrnas = JSON.parse(exon.mrnas)
-  exon.start = exon.start.to_i
-  exon.stop  = exon.stop.to_i
-  exon
+def table_to_exons( table )
+  table_map = [
+    :splicing,
+    :start,
+    :stop,
+    :chromosome,
+    :mrnas
+  ]
+  table.raw.map do |row|
+    params = Hash[table_map.zip(row)]
+    params[:start] = params[:start].to_i
+    params[:stop]  = params[:stop].to_i
+    params[:mrnas] = JSON.parse(params[:mrnas])
+    ParseFlybaseAnnotation::Exon.new(params)
+  end
 end
 
-def create_mrna_from_table( table )
-  mrna =
-    ParseFlybaseAnnotation::Mrna.new(Hash[
-      ['mrna_id','gene_id','strand','chromosome','exons'].zip(table.raw.first)
-  ])
-  mrna.exons = JSON.parse(mrna.exons)
-  mrna
-end
-
-def mongo
-  @mongo ||= Mongo::Connection.new('localhost').db('dmel_annotation')
+def table_to_mrnas( table )
+  table_map = [
+    :mrna_id,
+    :gene_id,
+    :strand,
+    :chromosome,
+    :exons
+  ]
+  table.raw.map do |row|
+    params = Hash[table_map.zip(row)]
+    params[:exons] = JSON.parse(params[:exons])
+    ParseFlybaseAnnotation::Mrna.new(params)
+  end
 end
 
 Given /^the annotation:$/ do |annotation|
@@ -44,30 +52,22 @@ When /^I parse annotation$/ do
   @result = ParseFlybaseAnnotation.parse('annotation')
 end
 
-When /^I parse and upload annotation$/ do
-  ParseFlybaseAnnotation::DB.should_receive(:new)
-    .and_return(ParseFlybaseAnnotation::DB.new('localhost','dmel_annotation'))
-  ParseFlybaseAnnotation.parse_and_upload('annotation')
-end
-
-Then /^there should be (\d+) mrnas/ do |number|
+Then /^there should be (\d+) mrnas$/ do |number|
   @result['mrnas'].count.should == number
 end
 
-Then /^there should be (\d+) exons/ do |number|
+Then /^there should be (\d+) exons$/ do |number|
   @result['exons'].count.should == number
 end
 
-Then /^there should be mrna/ do |table|
-  mrna = create_mrna_from_table( table )
-  @result['mrnas'].should include(mrna)
+Then /^there should be mrnas:$/ do |table|
+  table_to_mrnas( table ).each do |mrna|
+    @result['mrnas'].should include mrna
+  end
 end
 
-Then /^there should be exon/ do |table|
-  exon = create_exon_from_table(table)
-  @result['exons'].should include(exon)
-end
-
-Then /^collection "mrnas" should have (\d+) elements$/ do |number|
-  @mongo['mrnas'].count.should == number
+Then /^there should be exons:$/ do |table|
+  table_to_exons( table ).each do |exon|
+    @result['exons'].should include exon
+  end
 end
