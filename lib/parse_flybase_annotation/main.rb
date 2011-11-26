@@ -1,6 +1,5 @@
 module ParseFlybaseAnnotation
 
-  # code here needs heavy refactoring
   def self.parse( filepath )
     mrnas = []
     exons = []
@@ -43,9 +42,16 @@ module ParseFlybaseAnnotation
     mrna_id.scan(/\d+/).first
   end
 
+  # Parse chromosome name field
+  #
+  # For my purposes I only need data for 2L,2R,3R,3L,X chromosomes.
+  # Function parses this chromosome names and
+  # returns nil for all the others.
+  #
+  # @param [String] chromosome
+  # @return [String]
   def self.parse_chromosome_name( chromosome )
     case chromosome
-    when 'chrXhet', 'chrYhet' then nil
     when 'chr2L','chr2R','chr3R','chr3L','chrX' then
       chromosome[3,2]
     else
