@@ -31,7 +31,7 @@ Feature: Parse gene annotation
     And there should be mrnas:
       | CG11023-RA | 11023 | + | 2L | [[7680,8116],[8229,8589],[8668,9276]] |
       | CG11023-RB | 11023 | + | 2L | [[7680,8116],[8668,9276]] |
-    And there should be exon:
+    And there should be exons:
       | const | 7680 | 8116 | 2L | ["CG11023-RA", "CG11023-RB"] |
       | const | 8668 | 9276 | 2L | ["CG11023-RA", "CG11023-RB"] |
       | alt   | 8229 | 8589 | 2L | ["CG11023-RA"]               |
