@@ -10,7 +10,7 @@ module ParseFlybaseAnnotation
           mrnas << mrna if mrna.chromosome
         end
 
-    mrnas.maps(:gene_id).uniq.each do |gene_id|
+    mrnas.map(&:gene_id).uniq.each do |gene_id|
       exons <<
         self.generate_exons_from(
           mrnas.find_all{|mrna| mrna.gene_id == gene_id }
@@ -76,10 +76,10 @@ module ParseFlybaseAnnotation
     exons =
       start_coord
         .split(',')
-        .maps(:to_i)
+        .map(&:to_i)
         .zip( stop_coord
                 .split(',')
-                .maps(:to_i)
+                .map(&:to_i)
             )
     exons[0][0] = mrna_c_start.to_i
     exons[-1][-1] = mrna_c_stop.to_i
@@ -97,7 +97,7 @@ module ParseFlybaseAnnotation
 
     exons =
       mrnas
-        .maps(:exons)
+        .map(&:exons)
         .flatten(1)
         .uniq
         .map{|exon| Exon.new({'start'=>exon.first, 'stop'=>exon.last, 'mrnas'=>[]}) }
@@ -110,7 +110,7 @@ module ParseFlybaseAnnotation
       end
     end
 
-    mrna_ids = mrnas.maps(:mrna_id)
+    mrna_ids = mrnas.map(&:mrna_id)
     exons.each do |exon|
       mrna_ids.all?{|mrna_id| exon.mrnas.include?(mrna_id)} ? spl = 'const' : spl = 'alt'
       exon.splicing = spl
