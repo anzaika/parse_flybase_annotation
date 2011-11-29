@@ -6,7 +6,7 @@ require 'bundler/setup'
 require 'my_ruby_extensions'
 
 require "parse_flybase_annotation/main"
-require "parse_flybase_annotation/exon"
+require "parse_flybase_annotation/segment"
 require "parse_flybase_annotation/mrna"
 require "parse_flybase_annotation/version"
 

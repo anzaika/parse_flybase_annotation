@@ -1,14 +1,12 @@
 module ParseFlybaseAnnotation
 
   def self.parse( filepath )
-    mrnas = []
     exons = []
 
-    File.open(filepath, 'r')
-        .each_line do |ann_string|
-          mrna = self.generate_mrnas_from(ann_string)
-          mrnas << mrna if mrna.chromosome
-        end
+    mrnas =
+      File.open(filepath, 'r')
+          .each_line{|ann_line| self.ann_line_to_mrna(ann_line) if mrna.chromosome }
+          .compact
 
     mrnas.map(&:gene_id).uniq.each do |gene_id|
       exons <<
@@ -20,25 +18,28 @@ module ParseFlybaseAnnotation
     {'mrnas' => mrnas, 'exons' => exons.flatten}
   end
 
-  # Generate Mrna object from annotation string
+  # Parse one annotation line into one Mrna object
+  #
   # @param [String] ann_string annotation string
-  # @return [Mrna]
-  def self.generate_mrnas_from( ann_string )
-    splt = ann_string.split
+  # @return [ParseFlybaseAnnotation::Mrna]
+  def self.ann_line_to_mrna( ann_line )
+    # Since the line is tab-splitted, split it
+    splt = ann_line.split
     Mrna.new(
       {
         'mrna_id'    => splt[1],
-        'gene_id'    => self.generate_gene_id_from(splt[1]),
-        'chromosome' => self.parse_chromosome_name(splt[2]),
+        'gene_id'    => self.mrna_id_to_gene_id(splt[1]),
+        'chromosome' => self.parse_chromosome(splt[2]),
         'strand'     => splt[3],
-        'exons'      => self.parse_exons(splt[9], splt[10], splt[6], splt[7])
+        'exons'      => self.parse_segments(splt[9], splt[10], splt[6], splt[7])
       })
   end
 
   # Extract gene_id from mrna_id
+  #
   # @param [String] mrna_id
-  # @return [String]
-  def self.generate_gene_id_from( mrna_id )
+  # @return [String] gene_id
+  def self.mrna_id_to_gene_id( mrna_id )
     mrna_id.scan(/\d+/).first
   end
 
@@ -50,7 +51,7 @@ module ParseFlybaseAnnotation
   #
   # @param [String] chromosome
   # @return [String]
-  def self.parse_chromosome_name( chromosome )
+  def self.parse_chromosome( chromosome )
     case chromosome
     when 'chr2L','chr2R','chr3R','chr3L','chrX' then
       chromosome[3,2]
@@ -72,7 +73,7 @@ module ParseFlybaseAnnotation
   # @param [String] mrna_c_stop a string with integer denoting the stop
   #   of coding part of mrna
   # @return [Array]
-  def self.parse_exons( start_coord, stop_coord, mrna_c_start, mrna_c_stop )
+  def self.parse_segments( start_coord, stop_coord, mrna_c_start, mrna_c_stop )
     exons =
       start_coord
         .split(',')
@@ -93,7 +94,7 @@ module ParseFlybaseAnnotation
     raise
   end
 
-  def self.generate_exons_from( mrnas )
+  def self.generate_segments( mrnas )
 
     exons =
       mrnas

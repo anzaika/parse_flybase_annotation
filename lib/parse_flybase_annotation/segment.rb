@@ -1,6 +1,6 @@
 require 'ostruct'
 
 module ParseFlybaseAnnotation
-  class Exon < OpenStruct
+  class Segment < OpenStruct
   end
 end

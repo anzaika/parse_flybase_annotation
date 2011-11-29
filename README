@@ -1,7 +1,7 @@
 Purpose
 =======
 
-Extract exon information out of flybase gene annotation.
+Parse flybase gene annotation format.
 
 Source Data
 ===========
@@ -26,20 +26,20 @@ gene_id can be inferred from mrna_id: CG11023-RA --> 11023.
 Output
 ======
 
-Two collections: mRNAs and exons. Exons have their UTRs cut out.
+Two collections: mrnas and segments. Segments have their UTRs cut out.
 
 Blueprints:
 
-mRNA:
+mrna:
 
 * mrna_id     (String)
 * gene_id     (String)
 * strand      (String)  -- '+' or '-'
 * chromosome  (String)
-* exons       (Array[Array])  -- coordinates of exons, e.g.: [[1,2],[3,4]]
-                          sorted 5' --> 3'
+* segments    (Array[Array])  -- coordinates of segments, e.g.: [[1,2],[3,4]]
+                                 sorted 5' --> 3'
 
-exon:
+segment:
 
 * start      (Fixnum)
 * stop       (Fixnum)
@@ -54,5 +54,5 @@ Usage
 
   result = ParseFlybaseAnnotation.parse('path_to_annotation_file')
 
-  exons_collection = result['exons']
+  segments_collection = result['segments']
   mrnas_collection = result['mrnas']
