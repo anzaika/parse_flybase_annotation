@@ -28,8 +28,8 @@ module ParseFlybaseAnnotation
     Mrna.new(
       {
         'mrna_id'    => splt[1],
-        'gene_id'    => generate_gene_id_from(splt[1]),
-        'chromosome' => parse_chromosome_name(splt[2]),
+        'gene_id'    => self.generate_gene_id_from(splt[1]),
+        'chromosome' => self.parse_chromosome_name(splt[2]),
         'strand'     => splt[3],
         'exons'      => self.parse_exons(splt[9], splt[10], splt[6], splt[7])
       })
